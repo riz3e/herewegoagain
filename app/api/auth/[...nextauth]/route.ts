@@ -1,7 +1,17 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { compare } from 'bcrypt';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const handler = NextAuth({
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        updateAge: 24 * 60 * 60, // 24 hours
+
+    },
     providers: [
         CredentialsProvider({
             name: 'Credentials',
@@ -9,20 +19,33 @@ const handler = NextAuth({
                 email: {},
                 password: {}
             },
-            async authorize(credentials) {
-    // Add logic here to look up the user from the credentials supplied
-    const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
+            async authorize(credentials: any) {
+                try{
+                const user = await prisma.user.findUnique({
+                    where: {
+                        email: credentials.email
+                    }
+                });
+                console.log(user);
+                if (!user) {
+                    throw new Error("No user found");
+                }
 
-    if (user) {
-        // Any object returned will be saved in `user` property of the JWT
-        return user
-    } else {
-        // If you return null then an error will be displayed advising the user to check their details.
-        return null
+                const PasswordCheck = await compare(credentials?.password || "", user.password)
+                if (!PasswordCheck) {
+                    throw new Error("Password is incorrect");
+                }
 
-        // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
-    }
-}
+
+                return {
+                    id: user.id,
+                    email: user.email,
+                }}
+                catch (error) {
+                    console.log(error);
+                    throw new Error(JSON.stringify(error));
+                }
+            }
         })
     ],
 })
