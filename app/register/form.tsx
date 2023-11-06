@@ -1,4 +1,5 @@
 'use client'
+import { redirect } from 'next/navigation'
 import React, { FormEvent } from 'react'
 
 const RegForm = () => {
@@ -12,6 +13,10 @@ const RegForm = () => {
                 password: formData.get('password')
             }),
         })
+
+        if(response.status === 200) {
+            redirect('/')
+        }
     }
   return (
     <form onSubmit={HandleSubmit} className='form-control p-5 my-5 gap-2 mx-auto max-w-md mt-10'>

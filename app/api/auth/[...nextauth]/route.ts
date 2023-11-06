@@ -6,6 +6,9 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const handler = NextAuth({
+    pages: {
+        signIn: '/login',
+    },
     session: {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -26,7 +29,7 @@ const handler = NextAuth({
                         email: credentials.email
                     }
                 });
-                console.log(user);
+                // console.log(user);
                 if (!user) {
                     throw new Error("No user found");
                 }
@@ -36,7 +39,7 @@ const handler = NextAuth({
                     throw new Error("Password is incorrect");
                 }
 
-
+                
                 return {
                     id: user.id,
                     email: user.email,

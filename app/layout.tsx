@@ -4,6 +4,7 @@ import './globals.css'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import LogoutNavBarBtn from './components/LogoutNavBarBtn'
+import AuthProvider from './context/AuthProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,13 +22,15 @@ export default async function RootLayout({
   return (
     <html lang="en" data-theme="business">
       <body className={inter.className}>
+      <AuthProvider>
         <nav>
           {!!session && <LogoutNavBarBtn />}
-          {!session && <Link href='/login' passHref><button className='btn'>Login</button></Link>}
+          {!session && <Link href='/login' passHref><button className='btn m-5'>Login</button></Link>}
 
         </nav>
         <main>
           {children}</main>
+          </AuthProvider>
       </body>
     </html>
   )

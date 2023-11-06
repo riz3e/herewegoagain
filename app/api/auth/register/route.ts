@@ -13,6 +13,19 @@ export async function POST(request: Request) {
         const validation = CredentialModel.parse({ email, password });
         if (validation) {
 
+            const EmailChecker = await prisma.user.findUnique({
+                where: {
+                    email: email,
+                }
+            });
+
+            if(EmailChecker) {
+                return new NextResponse(
+                    JSON.stringify({
+                        message: "Email already exists",
+                    }), { status: 400 });
+            }
+            
             const hashedPassword = await hash(password, 10);
 
             // console.log({ email, password });
@@ -23,7 +36,12 @@ export async function POST(request: Request) {
                     password: hashedPassword,
                 }
             });
-            return new NextResponse(JSON.stringify(user), { status: 200 });
+            return new NextResponse(
+                JSON.stringify({
+                    id: user.id,
+                    email: user.email,
+                    createdAt: user.createdAt,
+            }), { status: 200 });
         }
 
 
