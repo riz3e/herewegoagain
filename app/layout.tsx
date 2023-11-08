@@ -6,6 +6,8 @@ import Link from 'next/link'
 import LogoutNavBarBtn from './components/LogoutNavBarBtn'
 import AuthProvider from './context/AuthProvider'
 
+import NavBar from './components/NavBar'
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -18,18 +20,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession();
   return (
     <html lang="en" data-theme="business">
       <body className={inter.className}>
       <AuthProvider>
-        <nav>
-          {!!session && <LogoutNavBarBtn />}
-          {!session && <Link href='/login' passHref><button className='btn m-5'>Login</button></Link>}
-
-        </nav>
+        <NavBar />
         <main>
-          {children}</main>
+          {children}
+          </main>
           </AuthProvider>
       </body>
     </html>
